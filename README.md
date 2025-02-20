@@ -1,89 +1,121 @@
 
-Below is an example `README.md` file with emoji and your name included. You can adjust any details as needed:
-
 ```markdown
-# DNS Spoofing Simulation Tool 🚀
+# ARP & DNS Spoofing Tool
 
-## Overview
-This DNS Spoofing Simulation Tool is designed **for educational purposes only**. It demonstrates how DNS spoofing and ARP poisoning can be used in a controlled lab environment to simulate a man‑in‑the‑middle (MITM) attack. **Use responsibly!**
+This tool is designed to demonstrate ARP and DNS spoofing, commonly used in Man-in-the-Middle (MITM) attacks. The tool can be used for educational and ethical hacking purposes only, and it should only be run in a controlled, legal, and authorized environment (e.g., penetration testing lab).
 
-> **Disclaimer:**  
-> ⚠️ This tool is for educational and ethical testing only.  
-> Unauthorized use on public or production networks is illegal.  
-> By using this tool, you agree to use it solely in environments where you have explicit permission.
+## Disclaimer
 
-## Features 🛠️
-- **DNS Spoofing:** Continuously sends forged DNS responses to redirect traffic for a specific domain.
-- **ARP Poisoning:** Positions the attack machine as a man‑in‑the‑middle between the victim and the gateway.
-- **Continuous Operation:** Runs indefinitely until manually stopped (CTRL+C).
-- **Automatic Restoration:** Attempts to restore ARP tables when the attack is stopped.
+**By using this tool, you agree that:**
+- This tool is for educational and ethical purposes only.
+- You must have explicit permission from the network owner before running this tool.
+- The author is not responsible for any malicious or illegal activity performed using this tool.
 
-## Tech Stack 💻
-- **Python 3**  
-- **Scapy:** For packet crafting and network operations.
-- **Threading & Signal Handling:** To manage continuous operations and graceful exits.
+**Any unauthorized use of this tool is illegal and the sole responsibility of the user.**
 
-## Installation 📦
+## Features
 
-1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/yourusername/dns-spoofing-simulation-tool.git
-   cd dns-spoofing-simulation-tool
-   ```
+- **ARP Spoofing**: The tool continuously sends ARP poison packets to the victim and gateway, positioning the attacker in a Man-in-the-Middle (MITM) position.
+- **DNS Spoofing**: The tool forges DNS responses for a specified domain, redirecting the victim to a fake IP address.
+- **Graceful Exit**: The tool restores ARP tables and exits cleanly when interrupted (e.g., via `Ctrl+C`).
+- **User Input**: Prompts the user to input the victim's IP, the gateway's IP, the domain to spoof, and the fake IP address.
+- **Logging**: Detailed logs track ARP poisoning and DNS spoofing actions.
+- **Colored Output**: Displays colorful, informative output using `termcolor`.
+- **Banner**: The script includes a large banner with a disclaimer and your name using `pyfiglet`.
 
-2. **Create a Virtual Environment (Recommended):**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate   # On Linux/macOS
-   venv\Scripts\activate      # On Windows
-   ```
+## Requirements
 
-3. **Install Dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-   *Make sure `scapy` is installed.*
+- Python 3.x
+- Scapy: For crafting and sending ARP and DNS packets
+- pyfiglet: For generating the banner text
+- termcolor: For coloring the output text
 
-## Usage 🚦
+You can install the required dependencies by running:
 
-1. **Run the Tool with Elevated Privileges:**
-
-   - **Linux/macOS:**
-     ```bash
-     sudo python3 dns_spoofing_tool.py
-     ```
-   - **Windows:**  
-     Run your Command Prompt as Administrator and execute:
-     ```bash
-     python dns_spoofing_tool.py
-     ```
-
-2. **Follow the Prompts:**
-   - **Victim's IP Address:** (e.g., `192.1x.x.2`)
-   - **Gateway/DNS Server IP Address:** (e.g., `192.x.x.1`)
-   - **Domain to Spoof:** (e.g., `www.exapmle.com`)
-   - **Fake IP Address:** (e.g., `192.x.x.56`)
-
-3. **Stop the Tool:**
-   - Press **CTRL+C** to gracefully stop the attack. The script will attempt to restore the network settings automatically.
-
-## Contributing 🤝
-Contributions are welcome!  
-1. Fork the repository.
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
-3. Commit your changes (`git commit -m 'Add amazing feature'`).
-4. Push to the branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request.
-
-## Developed By
-**Sujal Lamichhane**  
-Feel free to reach out via [GitHub](https://github.com/sujallamichhan18) .
-
-## License 📄
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-*Happy Testing! Stay Ethical & Secure!* 🔒
+```bash
+pip install scapy pyfiglet termcolor
 ```
 
+## Creating a Virtual Environment
+
+To create a clean, isolated environment for running this tool, follow these steps:
+
+1. **Create a virtual environment:**
+
+```bash
+python3 -m venv arp_dns_env
+```
+
+2. **Activate the virtual environment:**
+
+   - **On Linux/macOS:**
+
+   ```bash
+   source arp_dns_env/bin/activate
+   ```
+
+   - **On Windows:**
+
+   ```bash
+   .\arp_dns_env\Scripts\activate
+   ```
+
+3. **Install the required dependencies:**
+
+```bash
+pip install scapy pyfiglet termcolor
+```
+
+4. **Verify the installation:**
+
+```bash
+pip list
+```
+
+This will show you a list of installed packages, ensuring that the dependencies are properly installed within the virtual environment.
+
+## Usage
+
+1. Clone the repository or download the script.
+2. Run the script in a terminal with root/administrator privileges (required for packet sending).
+
+```bash
+python3 arp_dns_spoof.py
+```
+
+3. The script will display a colorful banner and prompt you for the following inputs:
+   - **Victim's IP Address**: The IP address of the target machine.
+   - **Gateway/DNS Server's IP Address**: The IP address of the gateway or DNS server.
+   - **Domain to Spoof**: The domain name (e.g., `www.example.com`) to be redirected.
+   - **Fake IP Address**: The IP address to which the domain will be redirected (e.g., `192.168.1.100`).
+
+4. After entering the required information, the tool will start ARP poisoning and DNS spoofing.
+5. The attack will run until you interrupt it using `Ctrl+C`.
+6. When you stop the attack, the ARP tables will be restored to their original state.
+
+## Example
+
+```bash
+Enter Victim's IP Address: 192.168.1.10
+Enter Gateway/DNS Server's IP Address: 192.168.1.1
+Enter Domain to Spoof (e.g., www.example.com): www.example.com
+Enter Fake IP Address to Redirect to (e.g., 192.168.1.100): 192.168.1.100
+```
+
+The script will then start ARP and DNS spoofing, showing logs of the actions being taken.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Warning
+
+This tool is intended for use on authorized networks and systems only. Unauthorized use is illegal and punishable by law. Always obtain explicit permission before testing any network or system.
+
+## Contact
+
+If you have any questions or feedback, feel free to contact me:
+
+- Name: Sujal Lamichhane
+- Website: [www.sujallamichhane.com.np](https://www.sujallamichhane.com.np)
+```

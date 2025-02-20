@@ -1,5 +1,5 @@
 # dns-spoofing-tool
-Sure! Here's the `README.md` content formatted in a more concise, single-page format:
+
 
 ```markdown
 # DNS Spoofing Simulation Tool

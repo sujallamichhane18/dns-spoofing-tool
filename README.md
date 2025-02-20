@@ -1,17 +1,18 @@
 
+
 ```markdown
-# ARP & DNS Spoofing Tool
+# DNS Spoof Tool
 
 This tool is designed to demonstrate ARP and DNS spoofing, commonly used in Man-in-the-Middle (MITM) attacks. The tool can be used for educational and ethical hacking purposes only, and it should only be run in a controlled, legal, and authorized environment (e.g., penetration testing lab).
 
 ## Disclaimer
 
-**By using this tool, you agree that:**
+By using this tool, you agree that:
 - This tool is for educational and ethical purposes only.
 - You must have explicit permission from the network owner before running this tool.
 - The author is not responsible for any malicious or illegal activity performed using this tool.
 
-**Any unauthorized use of this tool is illegal and the sole responsibility of the user.**
+Any unauthorized use of this tool is illegal and the sole responsibility of the user.
 
 ## Features
 
@@ -43,21 +44,21 @@ To create a clean, isolated environment for running this tool, follow these step
 1. **Create a virtual environment:**
 
 ```bash
-python3 -m venv arp_dns_env
+python3 -m venv dns_spoof_env
 ```
 
 2. **Activate the virtual environment:**
 
-   - **On Linux/macOS:**
+   - On Linux/macOS:
 
    ```bash
-   source arp_dns_env/bin/activate
+   source dns_spoof_env/bin/activate
    ```
 
-   - **On Windows:**
+   - On Windows:
 
    ```bash
-   .\arp_dns_env\Scripts\activate
+   .\dns_spoof_env\Scripts\activate
    ```
 
 3. **Install the required dependencies:**
@@ -80,7 +81,7 @@ This will show you a list of installed packages, ensuring that the dependencies 
 2. Run the script in a terminal with root/administrator privileges (required for packet sending).
 
 ```bash
-python3 arp_dns_spoof.py
+python3 dns_spoof_tool.py
 ```
 
 3. The script will display a colorful banner and prompt you for the following inputs:

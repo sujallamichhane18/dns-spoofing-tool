@@ -118,5 +118,5 @@ This tool is intended for use on authorized networks and systems only. Unauthori
 If you have any questions or feedback, feel free to contact me:
 
 - Name: Sujal Lamichhane
-- Website: [www.sujallamichhane.com.np](https://www.sujallamichhane.com.np)
+- Website: sujallamichhane.com.np
 ```

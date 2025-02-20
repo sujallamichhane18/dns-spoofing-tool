@@ -81,7 +81,7 @@ This will show you a list of installed packages, ensuring that the dependencies 
 2. Run the script in a terminal with root/administrator privileges (required for packet sending).
 
 ```bash
-python3 dns_spoof_tool.py
+sudo python3 main.py
 ```
 
 3. The script will display a colorful banner and prompt you for the following inputs:

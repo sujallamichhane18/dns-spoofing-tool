@@ -1,3 +1,5 @@
 scapy
 streamlit
 pyshark
+pyfiglet 
+termcolor

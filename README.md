@@ -5,14 +5,7 @@
 
 This tool is designed to demonstrate ARP and DNS spoofing, commonly used in Man-in-the-Middle (MITM) attacks. The tool can be used for educational and ethical hacking purposes only, and it should only be run in a controlled, legal, and authorized environment (e.g., penetration testing lab).
 
-## Disclaimer
-
-By using this tool, you agree that:
-- This tool is for educational and ethical purposes only.
-- You must have explicit permission from the network owner before running this tool.
-- The author is not responsible for any malicious or illegal activity performed using this tool.
-
-Any unauthorized use of this tool is illegal and the sole responsibility of the user.
+This tool is provided "as is" for educational purposes. The author and contributors are not liable for any damages or legal consequences resulting from its use. Always act responsibly and within the law.
 
 ## Features
 

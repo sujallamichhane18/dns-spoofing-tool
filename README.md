@@ -1,7 +1,7 @@
 ```markdown
 🔐 DNS Spoofing Tool (Educational & Ethical Use Only)
 
-A Python-based ARP and DNS spoofing tool designed **strictly for educational and authorized penetration testing. This tool demonstrates how DNS spoofing works in local network environments and can be used to study the importance of network-layer security.
+A Python-based ARP and DNS spoofing tool designed strictly for educational and authorized penetration testing. This tool demonstrates how DNS spoofing works in local network environments and can be used to study the importance of network-layer security.
 
 > ⚠️ Important: This script must only be used on systems and networks you have explicit permission to test.
 
